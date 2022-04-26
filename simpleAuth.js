@@ -7,7 +7,7 @@ function authUser(req, res, next){
 	next()
 }
 
-function authRole(role){
+/*function authRole(role){
 	return (req, res, next) => {
 		if(req.session.user.type !== role){
 			res.status(401)
@@ -15,9 +15,9 @@ function authRole(role){
 		}
 		next()
 	}
-}
+}*/
 
 module.exports = {
-	authUser,
-	authRole
+	authUser//,
+	//authRole
 }

@@ -14,7 +14,8 @@
  app.set("view engine", "ejs")
  app.use(express.static("public"))
  const session = require("express-session")
- const { authUser, authRole } = require("./simpleAuth")
+ //const { authUser, authRole } = require("./simpleAuth")
+ const { authUser } = require("./simpleAuth")
  // initialize express-session to allow us track the logged-in user across sessions.
  app.use(
 	 session({
@@ -43,18 +44,49 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 	app.get("/", (req, res) => {
 		res.render("Login")
 		res.status(200)
-	  });
+	})
+
+	app.get("/Login", (req, res) => {
+		res.render("Login")
+	})
+
+	app.get("/Register", (req, res) => {
+		res.render("Register")
+	})
+
+	app.get("/user_homepage", authUser, (req, res) => {
+		res.render("user_homepage")
+	})
+
+	app.get("/profile", authUser, (req, res) => {
+		var db = client.db("users")
+		var db_collection = db.collection("users_info")
+
+		db_collection.find({ "id": req.session.user.id }).toArray(function (err, allDetails) {
+			if (err) {
+				console.log(err)
+			}
+			else {
+				res.render("profile", { details: allDetails[0] })
+			}
+		})
+	})
+
+	app.get("/add_dog", authUser, (req, res) => {
+		res.render("add_dog")
+	})
+
 
 	app.post("/auth", (req, res) => {
 		// Get login data
-		var user_name = req.body.Email_Address
-		var passwordd = req.body.pass
+		var user_id = req.body.id
+		var password = req.body.pass
 		// Connect to db and collection
-		db = client.db("human-resources-workers")
-		db_collection = db.collection("humanResourcsesWorkersLogin")
+		db = client.db("users")
+		db_collection = db.collection("users_login")
 		
 		if (db_collection) {
-			db_collection.find({ "user": user_name, "password": passwordd }).toArray(function (err, users) {
+			db_collection.find({ "id": user_id, "password": password }).toArray(function (err, users) {
 				if (users.length == 1) {
 					req.session.user = {
 						"id": users[0].id,
@@ -62,7 +94,7 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 						"fullname":users[0].full_name
 					}
 					// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-					res.redirect("/" + homepage_name)
+					res.redirect("/user_homepage")
 				}
 
 				else {
@@ -77,6 +109,7 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 	app.post("/Register", (req, res) => {
 		var db = client.db("users")
 		var db_collection = db.collection("users_info")
+		
 		// Get all the data the user enter
 		var id = req.body.id
 		var first_name = req.body.first_name
@@ -89,54 +122,50 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 		var data = null
 		// Check if the user name is already taken
 		if (db_collection) {
-			db_collection.find({"email": email}).count().then(function (numItems) {
-				if (numItems) {
+			db_collection.findOne({"id": id}).then(user => {
+				if (user) {
 					console.log("User already exists")
+					// ADD POP UP WINDOW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+					return res.redirect("/Login")
+				}
+				else {
+					data = {
+						"id": id,
+						"first_name": first_name,
+						"last_name": last_name,
+						"gender": gender,
+						"email": email,
+						"phone_number": phone_number,
+						"password": password,
+						"dogs": []
+					}
+					// Add a new user to "users_info" collection with all of his information
+					db_collection.insertOne(data, function (err, collection) {
+						if (err) {
+							throw err
+						}
+						console.log("Record inserted Successfully" + collection.insertedCount)
+					})
+
+					// Add a new user to "users_login" collection with all of his information
+					var db_collection_login = db.collection("users_login")
+					data = {
+						"id": id,
+						//"email": email,
+						"password": password
+					}
+					db_collection_login.insertOne(data, function (err, collection) {
+						if (err) {
+							throw err
+						}
+						console.log("Record inserted Successfully" + collection.insertedCount)
+					})
 					res.redirect("/Login")
 				}
-				data = {
-					"id": id,
-					"first_name": first_name,
-					"last_name": last_name,
-					"gender": gender,
-					"email": email,
-					"phone_number": phone_number,
-					"company_name": company_name,
-					"user": username,
-					"password": password,
-					"hiring": [],
-					"job_requests": [],
-					"work_history": [],
-					"canceled_jobs": []
-				}
-				// Add a new employee to "employersWorkers" collection with all of his information
-				db_collection.insertOne(data, function (err, collection) {
-					if (err) {
-						throw err
-					}
-					console.log("Record inserted Successfully" + collection.insertedCount)
-
-					// Send an email to the new employee with his username and password
-					var message = "Welcome " + first_name + " " + last_name + "!\nWe are happy that you chose to work with our company."
-					message = message + "\nYour login information is:\nUsername: " + username + "\nPassword: " + password + "\n\nHope you will enjoy our site!"
-					send_an_email(email, "Welcome to SCE Contractor!", message)
-				})
-
+				
 			})
 		}
-		var db_collection_login = db.collection("employersWorkersLogin")
-		data = {
-			"user": username,
-			"full_name": first_name + " " + last_name,
-			"password": password
-		}
-		db_collection_login.insertOne(data, function (err, collection) {
-			if (err) {
-				throw err
-			}
-			console.log("Record inserted Successfully" + collection.insertedCount)
-		})
-		res.redirect("/Login")
+		
 	})
 
 })
