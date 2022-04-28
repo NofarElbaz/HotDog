@@ -165,7 +165,85 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 				
 			})
 		}
+	})
+
+	app.post("/update_profile", (req, res) => {
+		var db = client.db("users")
+		var db_collection = db.collection("users_info")
 		
+		// Get all the data the user enter
+		//var id = req.body.id
+		var first_name = req.body.first_name
+		var last_name = req.body.last_name
+		var email = req.body.email
+		var phone_number = req.body.phone
+		var new_password = req.body.password
+
+		
+		
+		var data = null
+		// Check if the user name is already taken
+		if (db_collection) {
+			db_collection.findOne({"id": req.session.user.id}).then(user => {
+				if (user) {
+					new_data = {
+					}
+					if(first_name) {
+						new_data['first_name'] = first_name
+					}
+					if(last_name) {
+						new_data['last_name'] = last_name
+					}
+					if(email) {
+						new_data['email'] = email
+					}
+					if(phone_number != undefined) {
+						new_data['phone_number'] = phone_number
+					}
+					// Check if the user enterd a new password
+					if(new_password == user.password){
+						// Didn't change
+						// If the user didn't change any detail
+						if(!first_name && !last_name && !email && phone_number == undefined){
+							res.redirect("/user_homepage")
+						}
+						else{
+							var newvalues = { $set: new_data };
+							db_collection.updateOne({"id": req.session.user.id}, newvalues, function(err, data) {
+    						if (err) throw err;
+   							console.log("1 document updated");
+							res.redirect("/user_homepage")
+  						});
+						}						
+					}
+					// Changed the password
+					else {
+						new_data['password'] = new_password
+						// Update the data for 'users_info' collection
+						var newvalues = { $set: new_data };
+						db_collection.updateOne({"id": req.session.user.id}, newvalues, function(err, data) {
+    						if (err) throw err;
+   							console.log("1 document updated");
+  						});
+						// Update the data for 'users_login' collection
+						db_collection = db.collection("users_login")
+						new_data = {'password' : new_password}
+						newvalues = { $set: new_data };
+						db_collection.updateOne({"id": req.session.user.id}, newvalues, function(err, data) {
+    						if (err) throw err;
+   							console.log("1 document updated");
+							res.redirect("/user_homepage")
+  						});
+					}
+					
+				}
+				else {
+					res.redirect("/user_homepage")
+				}
+				
+			})
+		}
+
 	})
 
 })
