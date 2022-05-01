@@ -3,9 +3,13 @@
     /*==================================================================
         [ Daterangepicker ]*/
     try {
+		var date2 = new Date();
+		date2.setDate(date2.getDate());
+
         $('.js-datepicker').daterangepicker({
             "singleDatePicker": true,
             "showDropdowns": true,
+			"maxDate":date2,
             "autoUpdateInput": false,
             locale: {
                 format: 'DD/MM/YYYY'

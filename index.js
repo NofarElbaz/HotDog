@@ -14,7 +14,6 @@
  app.set("view engine", "ejs")
  app.use(express.static("public"))
  const session = require("express-session")
- //const { authUser, authRole } = require("./simpleAuth")
  const { authUser } = require("./simpleAuth")
  // initialize express-session to allow us track the logged-in user across sessions.
  app.use(
@@ -55,7 +54,7 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 	})
 
 	app.get("/user_homepage", authUser, (req, res) => {
-		res.render("user_homepage")
+		res.render("user_homepage", { details: {"first_name": req.session.user.first_name} })
 	})
 
 	app.get("/profile", authUser, (req, res) => {
@@ -72,10 +71,18 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 		})
 	})
 
+	app.get("/my_dogs", authUser, (req, res) => {
+		res.render("my_dogs", { details: {"first_name": req.session.user.first_name} })
+	})
+
 	app.get("/add_dog", authUser, (req, res) => {
 		res.render("add_dog")
 	})
 
+	app.post("/logout", (req, res) => {
+		req.session.user = null
+		res.render("Login")
+	})
 
 	app.post("/auth", (req, res) => {
 		// Get login data
@@ -88,13 +95,14 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 		if (db_collection) {
 			db_collection.find({ "id": user_id, "password": password }).toArray(function (err, users) {
 				if (users.length == 1) {
-					req.session.user = {
-						"id": users[0].id,
-						// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-						"fullname":users[0].full_name
-					}
-					// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-					res.redirect("/user_homepage")
+					db_collection_info = db.collection("users_info")
+					db_collection_info.find({ "id": user_id}).toArray(function (err, users) {
+						req.session.user = {
+							"id": users[0].id,
+							"first_name":users[0].first_name
+						}
+						res.redirect("/user_homepage")
+					})
 				}
 
 				else {
@@ -105,6 +113,43 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 		}
 		else { res.redirect("/Login") }
 	})
+
+	app.post("/add_new_dog", (req, res) => {
+		// Connect to the collection
+		var db = client.db("dogs")
+		var db_collection = db.collection("dogs_info")
+
+		// Get all the data the user enter
+		var dog_name = req.body.name
+		var dog_breed = req.body.breed
+		var dog_color = req.body.color
+		var dog_birthday = req.body.birthday
+		var dog_gender = req.body.radio
+
+		var data = {
+			"dog_owner_id": req.session.user.id,
+			"dog_name": dog_name,
+			"dog_breed": dog_breed,
+			"dog_color": dog_color,
+			"dog_birthday": dog_birthday,
+			"dog_gender": dog_gender
+		}
+		// Check if the user name is already taken
+		if (db_collection) {
+			db_collection.insertOne(data, function (err, collection) {
+				if (err) {
+					throw err
+				}
+				console.log("Adding Dog Successfully")
+				res.redirect("/my_dogs")
+
+			})
+		}
+		else {
+			console.log("Adding Dog Failed")
+		}
+	})
+
 
 	app.post("/Register", (req, res) => {
 		var db = client.db("users")
