@@ -64,7 +64,7 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 
 		if (db_collection) {
 			db_collection.find({ "dog_owner_id": req.session.user.id }).toArray(function (err, dogs) {
-				res.render("user_homepage", { details: {"first_name": req.session.user.first_name}, dogs_info: dogs, curr_dog: null })
+				res.render("user_homepage", { user_first_name: req.session.user.first_name, dogs_info: dogs, curr_dog: null })
 			})
 		}
 
@@ -79,7 +79,7 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 				console.log(err)
 			}
 			else {
-				res.render("profile", { details: allDetails[0] })
+				res.render("profile", { user_first_name: req.session.user.first_name, details: allDetails[0] })
 			}
 		})
 	})
@@ -91,7 +91,7 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 
 		if (db_collection) {
 			db_collection.find({ "dog_owner_id": req.session.user.id }).toArray(function (err, dogs) {
-				res.render("my_dogs", { details: {"first_name": req.session.user.first_name}, dogs_info: dogs })
+				res.render("my_dogs", { user_first_name: req.session.user.first_name, dogs_info: dogs })
 			})
 		}
 		
@@ -101,19 +101,39 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 		res.render("add_dog")
 	})
 
+	app.get("/delete_dog/:dog_id", authUser, (req, res) => {
+		// Connect to the dogs db and collection
+		var db = client.db("dogs")
+		var db_collection = db.collection("dogs_info")
+
+		var ObjectId = require('mongodb').ObjectID;
+		var myquery = { _id: new ObjectId(req.params.dog_id) }
+
+		if (db_collection) {
+			// Deleting dog from collection dogs_info
+			db_collection.deleteOne(myquery, function (err, obj) {
+				if (err) throw err
+				return obj
+			})
+			res.redirect("/my_dogs")
+		}
+
+	})
+
 	app.get("/edit_dog/:dog_id", authUser, (req, res) => {
-		console.log('here')
 		var dog_id = req.params.dog_id
+		var ObjectId = require('mongodb').ObjectID;
 
 		var db = client.db("dogs")
 		var db_collection = db.collection("dogs_info")
 		
-		db_collection.find({ "_id": dog_id }).toArray(function (err, allDetails) {
+		db_collection.find({ "_id": new ObjectId(dog_id) }).toArray(function (err, allDetails) {
 			if (err) {
 				console.log(err)
 			}
 			else {
-				res.render("edit_dog", {details: allDetails[0]})
+				console.log(allDetails[0])
+				res.render("edit_dog", {user_first_name: req.session.user.first_name, details: allDetails[0]})
 
 			}
 		})
@@ -170,7 +190,7 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 						choosen_dog = element
 					}
 				  });
-				res.render("user_homepage", { details: {"first_name": req.session.user.first_name}, dogs_info: dogs, curr_dog: choosen_dog})
+				res.render("user_homepage", { user_first_name: req.session.user.first_name, dogs_info: dogs, curr_dog: choosen_dog})
 			})
 		}
 	})
@@ -373,6 +393,55 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 			})
 		}
 
+	})
+
+	app.post("/update_dog_info", (req, res) => {
+		var db = client.db("dogs")
+		var db_collection = db.collection("dogs_info")
+		var ObjectId = require('mongodb').ObjectID;
+
+		// Get the dog ObjectID
+		var id = req.body.dog_id
+		// Get all the data the user enter
+		var name = req.body.name
+		var breed = req.body.breed
+		var color = req.body.color
+		var gender = req.body.radio
+		
+		var data = null
+		// Check if the user name is already taken
+		if (db_collection) {
+			db_collection.findOne({"_id": new ObjectId(id)}).then(user => {
+				if (user) {
+					new_data = {}
+					
+					if(name) {
+						new_data['dog_name'] = name
+					}
+					if(breed) {
+						new_data['dog_breed'] = breed
+					}
+					if(color) {
+						new_data['dog_color'] = color
+					}
+					if(gender != user.dog_gender) {
+						new_data['dog_gender'] = gender
+					}
+					
+					// Update the data for 'dogs_info' collection
+					var newvalues = { $set: new_data };
+					db_collection.updateOne({"_id": new ObjectId(id)}, newvalues, function(err, data) {
+    					if (err) throw err;
+   						console.log("1 document updated");
+						res.redirect("/my_dogs")
+  					});					
+				}
+				else {
+					res.redirect("/my_dogs")
+				}
+				
+			})
+		}
 	})
 
 })

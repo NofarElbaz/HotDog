@@ -39,7 +39,7 @@
         <div class="cssload-speeding-wheel"></div>
     </div>
     <div id="wrapper">
-		<%- include('../public/partials/user_nav', {name :`${details.first_name}`}); %>
+		<%- include('../public/partials/user_nav', {name :`${user_first_name}`}); %>
         <!-- Left navbar-header -->
         <div class="navbar-default sidebar" role="navigation">
             <div class="sidebar-nav navbar-collapse slimscrollsidebar">
@@ -114,7 +114,8 @@
                                     <div class="col-md-12">
                                         <input type="email" name='email' placeholder=<%= details.email %>
                                             class="form-control form-control-line" name="example-email"
-                                            id="example-email" pattern="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?">  </div>
+                                            id="example-email" pattern="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?">  
+										</div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-md-12">Password</label>
