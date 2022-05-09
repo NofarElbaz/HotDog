@@ -39,34 +39,7 @@
         <div class="cssload-speeding-wheel"></div>
     </div>
     <div id="wrapper">
-        <!-- Navigation -->
-        <nav class="navbar navbar-default navbar-static-top m-b-0">
-            <div class="navbar-header"> <a class="navbar-toggle hidden-sm hidden-md hidden-lg "
-                    href="javascript:void(0)" data-toggle="collapse" data-target=".navbar-collapse"><i class="fa fa-bars
-"></i></a>
-                <div class="top-left-part"><a class="logo" href="user_homepage"><b><img
-                                src="public_user_homepage/plugins/images/pixeladmin-logo.png" alt="home" /></b><span
-                            class="hidden-xs"><img src="public_user_homepage/plugins/images/pixeladmin-text.png" alt="home" /></span></a>
-                </div>
-                <ul class="nav navbar-top-links navbar-left m-l-20 hidden-xs">
-                    <li>
-                        <form role="search" class="app-search hidden-xs">
-                            <input type="text" placeholder="Search..." class="form-control"> <a href=""><i
-                                    class="fa fa-search"></i></a>
-                        </form>
-                    </li>
-                </ul>
-                <ul class="nav navbar-top-links navbar-right pull-right">
-                    <li>
-                        <a class="profile-pic" href="#"> <img src="public_user_homepage/plugins/images/users/varun.jpg" alt="user-img"
-                                width="36" class="img-circle"><b class="hidden-xs">Steave</b> </a>
-                    </li>
-                </ul>
-            </div>
-            <!-- /.navbar-header -->
-            <!-- /.navbar-top-links -->
-            <!-- /.navbar-static-side -->
-        </nav>
+        <%- include('../public/partials/user_nav', {name :`${details.first_name}`}); %>
         <!-- Left navbar-header -->
         <div class="navbar-default sidebar" role="navigation">
             <div class="sidebar-nav navbar-collapse slimscrollsidebar">
@@ -82,22 +55,6 @@
                     <li>
                         <a href="my_dogs" class="waves-effect"><i class="fa fa-table fa-fw"
                                 aria-hidden="true"></i><span class="hide-menu">My Dogs</span></a>
-                    </li>
-                    <li>
-                        <a href="public_user_homepage/fontawesome.html" class="waves-effect"><i class="fa fa-font fa-fw"
-                                aria-hidden="true"></i><span class="hide-menu">Icons</span></a>
-                    </li>
-                    <li>
-                        <a href="public_user_homepage/map-google.html" class="waves-effect"><i class="fa fa-globe fa-fw"
-                                aria-hidden="true"></i><span class="hide-menu">Google Map</span></a>
-                    </li>
-                    <li>
-                        <a href="public_user_homepage/blank.html" class="waves-effect"><i class="fa fa-columns fa-fw"
-                                aria-hidden="true"></i><span class="hide-menu">Blank Page</span></a>
-                    </li>
-                    <li>
-                        <a href="public_user_homepage/404.html" class="waves-effect"><i class="fa fa-info-circle fa-fw"
-                                aria-hidden="true"></i><span class="hide-menu">Error 404</span></a>
                     </li>
                 </ul>
             </div>
@@ -118,15 +75,15 @@
                     <!-- /.col-lg-12 -->
                 </div>
                 <!-- /row -->
+				<form class="login100-form validate-form" action="/auth" method="POST" >
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="white-box">
                             <h3 class="box-title">My Dogs</h3>
                             <div class="table-responsive">
-                                <table class="table">
+                                <table class="table" id="dogs-table">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
                                             <th>Name</th>
                                             <th>Breed</th>
                                             <th>Color</th>
@@ -135,48 +92,18 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>Deshmukh</td>
-                                            <td>Prohaska</td>
-                                            <td>@Genelia</td>
-                                            <td>admin</td>
-                                        </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td>Deshmukh</td>
-                                            <td>Gaylord</td>
-                                            <td>@Ritesh</td>
-                                            <td>member</td>
-                                        </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td>Sanghani</td>
-                                            <td>Gusikowski</td>
-                                            <td>@Govinda</td>
-                                            <td>developer</td>
-                                        </tr>
-                                        <tr>
-                                            <td>4</td>
-                                            <td>Roshan</td>
-                                            <td>Rogahn</td>
-                                            <td>@Hritik</td>
-                                            <td>supporter</td>
-                                        </tr>
-                                        <tr>
-                                            <td>5</td>
-                                            <td>Joshi</td>
-                                            <td>Hickle</td>
-                                            <td>@Maruti</td>
-                                            <td>member</td>
-                                        </tr>
-                                        <tr>
-                                            <td>6</td>
-                                            <td>Nigam</td>
-                                            <td>Eichmann</td>
-                                            <td>@Sonu</td>
-                                            <td>supporter</td>
-                                        </tr>
+										<% dogs_info.forEach(function(item){ %>
+											<tr>
+												<td style="display:none;"><%= item._id %></td>
+												<td><%= item.dog_name %></td>
+                                            	<td><%= item.dog_breed %></td>
+                                            	<td><%= item.dog_color %></td>
+                                           		<td><%= item.dog_birthday %></td>
+												<td><%= item.dog_gender %></td>
+												<td><button >Edit</button></td>
+												<td><button >Delete</button></td>
+											</tr>
+										<% }) %>
                                     </tbody>
                                 </table>
                             </div>
@@ -204,6 +131,49 @@
     <script src="public_user_homepage/js/waves.js"></script>
     <!-- Custom Theme JavaScript -->
     <script src="public_user_homepage/js/custom.min.js"></script>
+	<script>
+        $('.js-pscroll').each(function(){
+            var ps = new PerfectScrollbar(this);
+
+            $(window).on('resize', function(){
+                ps.update();
+            })
+        });
+    </script>
+	<script>
+        function addRowHandlers() {
+			console.log('dscn!!!!!!')
+            var table = document.getElementById("dogs-table");
+            var rows = table.getElementsByTagName("tr");
+
+            for (i = 0; i < rows.length; i++) {
+                var currentRow = table.rows[i]
+                var currentEditBtn = currentRow.getElementsByTagName("td")[6]
+				var currentDeleteBtn = currentRow.getElementsByTagName("td")[7]
+
+                var editClickHandler = function(row) {
+                    return function() {
+						console.log('dscn')
+                        var cell = row.getElementsByTagName("td")[0]
+                        var dog_id = cell.innerHTML
+                        window.location.href = 'edit_dog/'+ dog_id;
+                    }
+                }
+				var deleteClickHandler = function(row) {
+                    return function() {
+                        var cell = row.getElementsByTagName("td")[0]
+                        var dog_id = cell.innerHTML
+                        window.location.href = 'delete_dog/'+ dog_id;
+                    }
+                }
+
+                currentEditBtn.onclick = editClickHandler(currentRow);
+				currentDeleteBtn.onclick = deleteClickHandler(currentRow);
+            }
+        }
+		console.log('!!!!!!!!!!!!!')
+        window.onload = addRowHandlers();
+    </script>
 </body>
 
 </html>

@@ -41,7 +41,7 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
  	*/
 	// GET functions
 	app.get("/", (req, res) => {
-		res.render("Login")
+		res.render("homepage")
 		res.status(200)
 	})
 
@@ -53,8 +53,21 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 		res.render("Register")
 	})
 
+	app.get("/forgot_my_password", (req, res) => {
+		res.render("forgot_my_password")
+	})
+
 	app.get("/user_homepage", authUser, (req, res) => {
-		res.render("user_homepage", { details: {"first_name": req.session.user.first_name} })
+		// Connect to db and collection
+		db = client.db("dogs")
+		db_collection = db.collection("dogs_info")
+
+		if (db_collection) {
+			db_collection.find({ "dog_owner_id": req.session.user.id }).toArray(function (err, dogs) {
+				res.render("user_homepage", { details: {"first_name": req.session.user.first_name}, dogs_info: dogs, curr_dog: null })
+			})
+		}
+
 	})
 
 	app.get("/profile", authUser, (req, res) => {
@@ -72,12 +85,41 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 	})
 
 	app.get("/my_dogs", authUser, (req, res) => {
-		res.render("my_dogs", { details: {"first_name": req.session.user.first_name} })
+		// Connect to db and collection
+		db = client.db("dogs")
+		db_collection = db.collection("dogs_info")
+
+		if (db_collection) {
+			db_collection.find({ "dog_owner_id": req.session.user.id }).toArray(function (err, dogs) {
+				res.render("my_dogs", { details: {"first_name": req.session.user.first_name}, dogs_info: dogs })
+			})
+		}
+		
 	})
 
 	app.get("/add_dog", authUser, (req, res) => {
 		res.render("add_dog")
 	})
+
+	app.get("/edit_dog/:dog_id", authUser, (req, res) => {
+		console.log('here')
+		var dog_id = req.params.dog_id
+
+		var db = client.db("dogs")
+		var db_collection = db.collection("dogs_info")
+		
+		db_collection.find({ "_id": dog_id }).toArray(function (err, allDetails) {
+			if (err) {
+				console.log(err)
+			}
+			else {
+				res.render("edit_dog", {details: allDetails[0]})
+
+			}
+		})
+	})
+
+
 
 	app.post("/logout", (req, res) => {
 		req.session.user = null
@@ -114,7 +156,26 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 		else { res.redirect("/Login") }
 	})
 
-	app.post("/add_new_dog", (req, res) => {
+	app.post("/dog_info", authUser, (req, res) => {
+		// Connect to the collection
+		var db = client.db("dogs")
+		var db_collection = db.collection("dogs_info")
+
+		if (db_collection) {
+			db_collection.find({ "dog_owner_id": req.session.user.id}).toArray(function (err, dogs) {
+				// req.body.selected_dog
+				choosen_dog = null
+				dogs.forEach(element => {
+					if (element.dog_name == req.body.selected_dog){
+						choosen_dog = element
+					}
+				  });
+				res.render("user_homepage", { details: {"first_name": req.session.user.first_name}, dogs_info: dogs, curr_dog: choosen_dog})
+			})
+		}
+	})
+
+	app.post("/add_new_dog", authUser, (req, res) => {
 		// Connect to the collection
 		var db = client.db("dogs")
 		var db_collection = db.collection("dogs_info")
@@ -132,7 +193,10 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 			"dog_breed": dog_breed,
 			"dog_color": dog_color,
 			"dog_birthday": dog_birthday,
-			"dog_gender": dog_gender
+			"dog_gender": dog_gender,
+			"dog_temperature": "",
+			"dog_location": "",
+			"dog_pulse": ""
 		}
 		// Check if the user name is already taken
 		if (db_collection) {
@@ -212,6 +276,26 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 		}
 	})
 
+	app.post("/get_my_password", (req, res) => {
+		// Get the email
+		var email = req.body.email
+		
+		// Check if it's exsits in our db
+		var db = client.db("users")
+		var db_collection = db.collection("users_info")
+		db_collection.find({ "email": email }).toArray(function (err, allDetails) {
+			if(allDetails.length > 0) {
+				var full_name = allDetails[0].first_name + " " + allDetails[0].last_name
+				var password = allDetails[0].password
+				var msg = "Hey " + full_name + ",\nWe got a request for retriving your password.\nYour password is: " + password + "\n\nHave a nice day!\nHotDog"
+				send_an_email(email, "Forgot Password - HotDog", msg)
+			}
+		})
+
+		res.redirect("/Login")
+	})
+
+	
 	app.post("/update_profile", (req, res) => {
 		var db = client.db("users")
 		var db_collection = db.collection("users_info")
@@ -292,6 +376,32 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 	})
 
 })
+
+function send_an_email(receiver_email, subject, message) {
+	var nodemailer = require("nodemailer")
+	var transporter = nodemailer.createTransport({
+		service: "gmail",
+		auth: {
+			user: "hotdogsce@gmail.com",
+			pass: "Hd123456"
+		}
+	})
+
+	var mailOptions = {
+		from: "hotdogsce@gmail.com",
+		to: receiver_email,
+		subject: subject,
+		text: message
+	}
+
+	transporter.sendMail(mailOptions, function (error, info) {
+		if (error) {
+			console.log(error)
+		} else {
+			console.log("Email sent: " + info.response)
+		}
+	})
+}
 
 /**
  * Server Activation

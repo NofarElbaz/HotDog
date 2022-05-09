@@ -27,6 +27,8 @@
     <link href="public_user_homepage/css/animate.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="public_user_homepage/css/style.css" rel="stylesheet">
+	<!-- Select box CSS -->
+    <link href="public_select_element/select_design.css" rel="stylesheet">
     <!-- color CSS -->
     <link href="public_user_homepage/css/colors/blue-dark.css" id="theme" rel="stylesheet">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -60,28 +62,6 @@
                         <a href="my_dogs" class="waves-effect"><i class="fa fa-table fa-fw"
                                 aria-hidden="true"></i><span class="hide-menu">My Dogs</span></a>
                     </li>
-                    <li>
-                        <a href="public_user_homepage/fontawesome.html" class="waves-effect"><i class="fa fa-font fa-fw"
-                                aria-hidden="true"></i><span class="hide-menu">Icons</span></a>
-                    </li>
-                    <li>
-                        <a href="public_user_homepage/map-google.html" class="waves-effect"><i class="fa fa-globe fa-fw"
-                                aria-hidden="true"></i><span class="hide-menu">Google Map</span></a>
-                    </li>
-                    <li>
-                        <a href="public_user_homepage/blank.html" class="waves-effect"><i class="fa fa-columns fa-fw"
-                                aria-hidden="true"></i><span class="hide-menu">Blank Page</span></a>
-                    </li>
-                    <li>
-                        <a href="public_user_homepage/404.html" class="waves-effect"><i class="fa fa-info-circle fa-fw"
-                                aria-hidden="true"></i><span class="hide-menu">Error 404</span></a>
-                    </li>
-                </ul>
-                <div class="center p-20">
-                    <span class="hide-menu"><a href="http://wrappixel.com/templates/pixeladmin/" target="_blank"
-                            class="btn btn-danger btn-block btn-rounded waves-effect waves-light">Upgrade to
-                            Pro</a></span>
-                </div>
             </div>
         </div>
         <!-- Left navbar-header end -->
@@ -94,75 +74,100 @@
                     </div>
                     <!-- /.col-lg-12 -->
                 </div>
-                <!-- row -->
                 <div class="row">
-                    <!--col -->
-                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                        <div class="white-box">
-                            <div class="col-in row">
-                                <div class="col-md-6 col-sm-6 col-xs-6"> <i data-icon="E"
-                                        class="linea-icon linea-basic"></i>
-                                    <h5 class="text-muted vb">MYNEW CLIENTS</h5>
-                                </div>
-                                <div class="col-md-6 col-sm-6 col-xs-6">
-                                    <h3 class="counter text-right m-t-15 text-danger">23</h3>
-                                </div>
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-danger" role="progressbar"
-                                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-                                            <span class="sr-only">40% Complete (success)</span> </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /.col -->
-                    <!--col -->
-                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                        <div class="white-box">
-                            <div class="col-in row">
-                                <div class="col-md-6 col-sm-6 col-xs-6"> <i class="linea-icon linea-basic"
-                                        data-icon="&#xe01b;"></i>
-                                    <h5 class="text-muted vb">NEW PROJECTS</h5>
-                                </div>
-                                <div class="col-md-6 col-sm-6 col-xs-6">
-                                    <h3 class="counter text-right m-t-15 text-megna">169</h3>
-                                </div>
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-megna" role="progressbar"
-                                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-                                            <span class="sr-only">40% Complete (success)</span> </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /.col -->
-                    <!--col -->
-                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                        <div class="white-box">
-                            <div class="col-in row">
-                                <div class="col-md-6 col-sm-6 col-xs-6"> <i class="linea-icon linea-basic"
-                                        data-icon="&#xe00b;"></i>
-                                    <h5 class="text-muted vb">NEW INVOICES</h5>
-                                </div>
-                                <div class="col-md-6 col-sm-6 col-xs-6">
-                                    <h3 class="counter text-right m-t-15 text-primary">157</h3>
-                                </div>
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-primary" role="progressbar"
-                                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-                                            <span class="sr-only">40% Complete (success)</span> </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /.col -->
-                </div>
+					<section class="pb-5">
+					    <div class="container">
+					        <div class="row">
+					            <div class="col-lg-6">
+					                <div class="card border-0">
+					                    <div class="card-body p-0">
+											<form action="/dog_info" method="POST">
+					                        	<!-- AUTO COMPLETE DROPDOWN -->
+					                        	<select class="selectpicker form-control border-0 mb-1 px-4 py-4 rounded shadow" name="selected_dog" onchange="this.form.submit()">
+													<option value='select_dog'>Select a dog</option>
+													<% dogs_info.forEach(function(item){ %>
+														<option value=<%= item.dog_name %>><%= item.dog_name %></option>
+													<% }) %>
+					                        	</select>
+											</form>
+					                    </div>
+					                </div>
+					            </div>
+					        </div>
+					    </div>
+					</section>					
+				</div>
+				<!-- row -->
+				<% if(curr_dog!=null) { %>
+                	<div class="row">
+                	    <!--col -->
+                	    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                	        <div class="white-box">
+                	            <div class="col-in row">
+                	                <div class="col-md-6 col-sm-6 col-xs-6"> <i data-icon="E"
+                	                        class="linea-icon linea-basic"></i>
+                	                    <h5 class="text-muted vb"><%= curr_dog.dog_name%>'s Temperature (Celsius)</h5>
+                	                </div>
+                	                <div class="col-md-6 col-sm-6 col-xs-6">
+                	                    <h3 class="counter text-right m-t-15 text-danger"><%= curr_dog.dog_temperature%>℃</h3>
+                	                </div>
+                	                <div class="col-md-12 col-sm-12 col-xs-12">
+                	                    <div class="progress">
+                	                        <div class="progress-bar progress-bar-danger" role="progressbar"
+                	                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                	                            <span class="sr-only">40% Complete (success)</span> </div>
+                	                    </div>
+                	                </div>
+                	            </div>
+                	        </div>
+                	    </div>
+                	    <!-- /.col -->
+                	    <!--col -->
+                	    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                	        <div class="white-box">
+                	            <div class="col-in row">
+                	                <div class="col-md-6 col-sm-6 col-xs-6"> <i class="linea-icon linea-basic"
+                	                        data-icon="&#xe01b;"></i>
+                	                    <h5 class="text-muted vb"><%= curr_dog.dog_name%>'s Location</h5>
+                	                </div>
+                	                <div class="col-md-6 col-sm-6 col-xs-6">
+                	                    <h3 class="counter text-right m-t-15 text-megna"><%= curr_dog.dog_location%></h3>
+                	                </div>
+                	                <div class="col-md-12 col-sm-12 col-xs-12">
+                	                    <div class="progress">
+                	                        <div class="progress-bar progress-bar-megna" role="progressbar"
+                	                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                	                            <span class="sr-only">40% Complete (success)</span> </div>
+                	                    </div>
+                	                </div>
+                	            </div>
+                	        </div>
+                	    </div>
+                	    <!-- /.col -->
+                	    <!--col -->
+                	    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                	        <div class="white-box">
+                	            <div class="col-in row">
+                	                <div class="col-md-6 col-sm-6 col-xs-6"> <i class="linea-icon linea-basic"
+                	                        data-icon="&#xe00b;"></i>
+                	                    <h5 class="text-muted vb"><%= curr_dog.dog_name%>'s Pulse</h5>
+                	                </div>
+                	                <div class="col-md-6 col-sm-6 col-xs-6">
+                	                    <h3 class="counter text-right m-t-15 text-primary"><%= curr_dog.dog_pulse%></h3>
+                	                </div>
+                	                <div class="col-md-12 col-sm-12 col-xs-12">
+                	                    <div class="progress">
+                	                        <div class="progress-bar progress-bar-primary" role="progressbar"
+                	                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                	                            <span class="sr-only">40% Complete (success)</span> </div>
+                	                    </div>
+                	                </div>
+                	            </div>
+                	        </div>
+                	    </div>
+                	    <!-- /.col -->
+                	</div>
+				<% } %>
                 <!-- /.row -->
                 <!--row -->
     </div>
@@ -183,23 +188,12 @@
     <!--Morris JavaScript -->
     <script src="public_user_homepage/plugins/bower_components/raphael/raphael-min.js"></script>
     <script src="public_user_homepage/plugins/bower_components/morrisjs/morris.js"></script>
-    <!-- Custom Theme JavaScript -->
+    <!-- Select Box JavaScript -->
+	<script src="public_select_element/select_el.js"></script>
+	<!-- Custom Theme JavaScript -->
     <script src="public_user_homepage/js/custom.min.js"></script>
     <script src="public_user_homepage/js/dashboard1.js"></script>
     <script src="public_user_homepage/plugins/bower_components/toast-master/js/jquery.toast.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $.toast({
-                heading: 'Welcome to Pixel admin',
-                text: 'Use the predefined ones, or specify a custom position object.',
-                position: 'top-right',
-                loaderBg: '#ff6849',
-                icon: 'info',
-                hideAfter: 3500,
-                stack: 6
-            })
-        });
-    </script>
 </body>
 
 </html>
