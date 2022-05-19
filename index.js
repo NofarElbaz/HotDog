@@ -206,7 +206,6 @@ MongoClient.connect("mongodb+srv://HotDog:HotDog@cluster0.9q7j7.mongodb.net/HotD
 							datasets_dists[hour] = element.walking_met
 							
 						});
-						console.log(datasets_dists)
 						res.render("user_homepage", { user_first_name: req.session.user.first_name, dogs_info: dogs, curr_dog: choosen_dog, distance_hourly: datasets_dists})
 
 				});
