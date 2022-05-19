@@ -1,4 +1,6 @@
 // index.js
+const moment = require('moment')
+const today = moment().startOf('day')
 
 /**
  * Required External Modules
@@ -32,7 +34,7 @@
  
 const MongoClient = require("mongodb").MongoClient
 const bodyParser = require("body-parser")
-MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotDog?retryWrites=true&w=majority", { useUnifiedTopology: true }).then(client => {
+MongoClient.connect("mongodb+srv://HotDog:HotDog@cluster0.9q7j7.mongodb.net/HotDog?retryWrites=true&w=majority", { useUnifiedTopology: true }).then(client => {
 	console.log("Connected to Database")
 	app.use(bodyParser.urlencoded({ extended: true }))
 
@@ -189,8 +191,26 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 					if (element.dog_name == req.body.selected_dog){
 						choosen_dog = element
 					}
-				  });
-				res.render("user_homepage", { user_first_name: req.session.user.first_name, dogs_info: dogs, curr_dog: choosen_dog})
+				});
+				var db_collection_dist_hourly = db.collection("dog_dist_hourly")
+				db_collection_dist_hourly.find({ "dog_id": choosen_dog._id, date_created: {
+					$gte: today.toDate(), 
+					$lt: moment(today).endOf('day').toDate()
+					}}).toArray(function (err, dist_info) {
+						datasets_dists = new Array(24).fill(0);
+						
+						dist_info.forEach(element => {
+							hour = element.date_created.toString()
+							hour = (((hour.split(' '))[4]).split(':'))[0]
+							hour = Number(hour) - 3
+							datasets_dists[hour] = element.walking_met
+							
+						});
+						console.log(datasets_dists)
+						res.render("user_homepage", { user_first_name: req.session.user.first_name, dogs_info: dogs, curr_dog: choosen_dog, distance_hourly: datasets_dists})
+
+				});
+				
 			})
 		}
 	})
@@ -204,6 +224,7 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 		var dog_name = req.body.name
 		var dog_breed = req.body.breed
 		var dog_color = req.body.color
+		var dog_size = req.body.selected_size
 		var dog_birthday = req.body.birthday
 		var dog_gender = req.body.radio
 
@@ -214,9 +235,7 @@ MongoClient.connect("mongodb+srv://HotDog:Hd2022@cluster0.9q7j7.mongodb.net/HotD
 			"dog_color": dog_color,
 			"dog_birthday": dog_birthday,
 			"dog_gender": dog_gender,
-			"dog_temperature": "",
-			"dog_location": "",
-			"dog_pulse": ""
+			"dog_size": dog_size
 		}
 		// Check if the user name is already taken
 		if (db_collection) {

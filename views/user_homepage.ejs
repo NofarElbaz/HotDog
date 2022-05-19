@@ -33,11 +33,13 @@
     <link href="public_select_element/select_design.css" rel="stylesheet">
     <!-- color CSS -->
     <link href="public_user_homepage/css/colors/blue-dark.css" id="theme" rel="stylesheet">
+	
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	
 <![endif]-->
 </head>
 
@@ -130,7 +132,7 @@
                 	            <div class="col-in row">
                 	                <div class="col-md-6 col-sm-6 col-xs-6"> <i class="linea-icon linea-basic"
                 	                        data-icon="&#xe01b;"></i>
-                	                    <h5 class="text-muted vb"><%= curr_dog.dog_name%>'s Location</h5>
+                	                    <h5 class="text-muted vb"><%= curr_dog.dog_name%>'s Distance</h5>
                 	                </div>
                 	                <div class="col-md-6 col-sm-6 col-xs-6">
                 	                    <h3 class="counter text-right m-t-15 text-megna"><%= curr_dog.dog_location%></h3>
@@ -169,10 +171,49 @@
                 	    </div>
                 	    <!-- /.col -->
                 	</div>
+
+					<div id="distance_hourly_hid" style="visibility: hidden;"><%= distance_hourly %></div>
+					
 				<% } %>
                 <!-- /.row -->
                 <!--row -->
     </div>
+
+	<% if(curr_dog!=null) { %>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+		<canvas id="lineChart"></canvas>
+		<script>
+			//line
+			var ctxL = document.getElementById("lineChart").getContext('2d');
+			var myLineChart = new Chart(ctxL, {
+			  type: 'line',
+			  data: {
+				labels: ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
+						"13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
+				datasets: [{
+				  label: "Distance hourly",
+				  data: (document.getElementById("data".concat('', j.toString())).innerHTML).split(',').map(Number),
+				  backgroundColor: [
+					'rgba(105, 0, 132, .2)',
+				  ],
+				  borderColor: [
+					'rgba(200, 99, 132, .7)',
+				  ],
+				  borderWidth: 2
+				}
+				]
+			  },
+			  options: {
+				responsive: true
+			  }
+			});
+		</script>
+	<% } %>
+	
+
+
+
     <!-- /#wrapper -->
     <!-- jQuery -->
     <script src="public_user_homepage/plugins/bower_components/jquery/dist/jquery.min.js"></script>
@@ -196,6 +237,7 @@
     <script src="public_user_homepage/js/custom.min.js"></script>
     <script src="public_user_homepage/js/dashboard1.js"></script>
     <script src="public_user_homepage/plugins/bower_components/toast-master/js/jquery.toast.js"></script>
+	<script src="/views/linechart.js"></script>
 </body>
 
 </html>
