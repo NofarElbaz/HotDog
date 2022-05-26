@@ -103,6 +103,75 @@ MongoClient.connect("mongodb+srv://HotDog:HotDog@cluster0.9q7j7.mongodb.net/HotD
 		res.render("add_dog")
 	})
 
+	app.get("/hourly_distance/:dog_id", authUser, (req, res) => {
+
+		/*
+		console.log(req.params.dog_id)
+		res.render("hourly_distance",{ user_first_name: req.session.user.first_name})
+		*/
+		var db = client.db("dogs")
+		var db_collection_dist_hourly = db.collection("dog_AGG_avg_hourly")
+		var ObjectId = require('mongodb').ObjectID;
+		db_collection_dist_hourly.find({ "dog_id": new ObjectId(req.params.dog_id), date_created: {
+			$gte: today.toDate(), 
+			$lt: moment(today).endOf('day').toDate()
+			}}).toArray(function (err, dist_info) {
+				datasets_dists = new Array(24).fill(0);
+				dist_info.forEach(element => {
+					hour = element.date_created.toString()
+					hour = (((hour.split(' '))[4]).split(':'))[0]
+					hour = Number(hour) - 3
+					datasets_dists[hour] = element.walking_met_sum
+					
+				});
+				console.log(req.params.dog_id)
+				res.render("hourly_distance", { user_first_name: req.session.user.first_name,curr_dog: req.params.dog_id, distance_hourly: datasets_dists})
+			})
+	})
+
+	app.get("/hourly_temp/:dog_id", authUser, (req, res) => {
+
+		var db = client.db("dogs")
+		var db_collection_dist_hourly = db.collection("dog_AGG_avg_hourly")
+		var ObjectId = require('mongodb').ObjectID;
+		db_collection_dist_hourly.find({ "dog_id": new ObjectId(req.params.dog_id), date_created: {
+			$gte: today.toDate(), 
+			$lt: moment(today).endOf('day').toDate()
+			}}).toArray(function (err, dist_info) {
+				datasets_dists = new Array(24).fill(0);
+				dist_info.forEach(element => {
+					hour = element.date_created.toString()
+					hour = (((hour.split(' '))[4]).split(':'))[0]
+					hour = Number(hour) - 3
+					datasets_dists[hour] = element.temp_hourly_avg
+				});
+				console.log(req.params.dog_id)
+				res.render("hourly_temp", { user_first_name: req.session.user.first_name,curr_dog: req.params.dog_id, distance_hourly: datasets_dists})
+			})
+	})
+
+	app.get("/hourly_pulse/:dog_id", authUser, (req, res) => {
+
+		var db = client.db("dogs")
+		var db_collection_dist_hourly = db.collection("dog_AGG_avg_hourly")
+		var ObjectId = require('mongodb').ObjectID;
+		db_collection_dist_hourly.find({ "dog_id": new ObjectId(req.params.dog_id), date_created: {
+			$gte: today.toDate(), 
+			$lt: moment(today).endOf('day').toDate()
+			}}).toArray(function (err, dist_info) {
+				datasets_dists = new Array(24).fill(0);
+				dist_info.forEach(element => {
+					hour = element.date_created.toString()
+					hour = (((hour.split(' '))[4]).split(':'))[0]
+					hour = Number(hour) - 3
+					datasets_dists[hour] = element.pulse_hourly_avg
+				});
+				console.log(req.params.dog_id)
+				res.render("hourly_pulse", { user_first_name: req.session.user.first_name,curr_dog: req.params.dog_id, distance_hourly: datasets_dists})
+			})
+	})
+
+
 	app.get("/delete_dog/:dog_id", authUser, (req, res) => {
 		// Connect to the dogs db and collection
 		var db = client.db("dogs")
@@ -192,7 +261,7 @@ MongoClient.connect("mongodb+srv://HotDog:HotDog@cluster0.9q7j7.mongodb.net/HotD
 						choosen_dog = element
 					}
 				});
-				var db_collection_dist_hourly = db.collection("dog_dist_hourly")
+				var db_collection_dist_hourly = db.collection("dog_AGG_avg_hourly")
 				db_collection_dist_hourly.find({ "dog_id": choosen_dog._id, date_created: {
 					$gte: today.toDate(), 
 					$lt: moment(today).endOf('day').toDate()
@@ -203,7 +272,7 @@ MongoClient.connect("mongodb+srv://HotDog:HotDog@cluster0.9q7j7.mongodb.net/HotD
 							hour = element.date_created.toString()
 							hour = (((hour.split(' '))[4]).split(':'))[0]
 							hour = Number(hour) - 3
-							datasets_dists[hour] = element.walking_met
+							datasets_dists[hour] = element.walking_met_sum
 							
 						});
 						res.render("user_homepage", { user_first_name: req.session.user.first_name, dogs_info: dogs, curr_dog: choosen_dog, distance_hourly: datasets_dists})
