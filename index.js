@@ -150,6 +150,132 @@ MongoClient.connect("mongodb+srv://HotDog:HotDog@cluster0.9q7j7.mongodb.net/HotD
 			})
 	})
 
+
+	app.get("/daily_distance/:dog_id", authUser, (req, res) => {
+
+		var db = client.db("dogs")
+		var db_collection_dist_hourly = db.collection("dog_AGG_avg_daily")
+		var ObjectId = require('mongodb').ObjectID;
+		db_collection_dist_hourly.find({ "dog_id": new ObjectId(req.params.dog_id), date_created: {
+			$gte: moment().day(-7).toDate(),
+			$lt: today.toDate()
+			}}).toArray(function (err, dist_info) {
+				datasets_dists = new Array(7).fill(0);
+				dist_info.forEach(element => {
+					day = element.date_created.toString()
+					day = ((day.split(' '))[0])
+					switch(day){
+						case "Sun" :
+							datasets_dists[0] = element.walking_hours
+							return;
+						case "Mon" :
+							datasets_dists[1] = element.walking_hours
+							return;
+						case "Tue" :
+							datasets_dists[2] = element.walking_hours
+							return;
+						case "Wed" :
+							datasets_dists[3] = element.walking_hours
+							return;							
+						case "Thu" :
+							datasets_dists[4] = element.walking_hours
+							return;	
+						case "Fri" :
+							datasets_dists[5] = element.walking_hours
+							return;							
+						case "Sat" :
+							datasets_dists[6] = element.walking_hours
+							return;									
+					}
+				});
+				console.log(req.params.dog_id)
+				res.render("daily_distance", { user_first_name: req.session.user.first_name,curr_dog: req.params.dog_id, distance_daily: datasets_dists})
+			})
+	})
+
+	app.get("/daily_pulse/:dog_id", authUser, (req, res) => {
+
+		var db = client.db("dogs")
+		var db_collection_dist_hourly = db.collection("dog_AGG_avg_daily")
+		var ObjectId = require('mongodb').ObjectID;
+		db_collection_dist_hourly.find({ "dog_id": new ObjectId(req.params.dog_id), date_created: {
+			$gte: moment().day(-7).toDate(),
+			$lt: today.toDate()
+			}}).toArray(function (err, dist_info) {
+				datasets_dists = new Array(7).fill(0);
+				dist_info.forEach(element => {
+					day = element.date_created.toString()
+					day = ((day.split(' '))[0])
+					switch(day){
+						case "Sun" :
+							datasets_dists[0] = element.pulse_hourly_avg
+							return;
+						case "Mon" :
+							datasets_dists[1] = element.pulse_hourly_avg
+							return;
+						case "Tue" :
+							datasets_dists[2] = element.pulse_hourly_avg
+							return;
+						case "Wed" :
+							datasets_dists[3] = element.pulse_hourly_avg
+							return;							
+						case "Thu" :
+							datasets_dists[4] = element.pulse_hourly_avg
+							return;	
+						case "Fri" :
+							datasets_dists[5] = element.pulse_hourly_avg
+							return;							
+						case "Sat" :
+							datasets_dists[6] = element.pulse_hourly_avg
+							return;									
+					}
+				});
+				res.render("daily_pulse", { user_first_name: req.session.user.first_name,curr_dog: req.params.dog_id, pulse_daily: datasets_dists})
+			})
+	})
+
+	app.get("/daily_temp/:dog_id", authUser, (req, res) => {
+
+		var db = client.db("dogs")
+		var db_collection_dist_hourly = db.collection("dog_AGG_avg_daily")
+		var ObjectId = require('mongodb').ObjectID;
+		db_collection_dist_hourly.find({ "dog_id": new ObjectId(req.params.dog_id), date_created: {
+			$gte: moment().day(-7).toDate(),
+			$lt: today.toDate()
+			}}).toArray(function (err, dist_info) {
+				datasets_dists = new Array(7).fill(0);
+				dist_info.forEach(element => {
+					day = element.date_created.toString()
+					day = ((day.split(' '))[0])
+					switch(day){
+						case "Sun" :
+							datasets_dists[0] = element.temp_daily_avg
+							return;
+						case "Mon" :
+							datasets_dists[1] = element.temp_daily_avg
+							return;
+						case "Tue" :
+							datasets_dists[2] = element.temp_daily_avg
+							return;
+						case "Wed" :
+							datasets_dists[3] = element.temp_daily_avg
+							return;							
+						case "Thu" :
+							datasets_dists[4] = element.temp_daily_avg
+							return;	
+						case "Fri" :
+							datasets_dists[5] = element.temp_daily_avg
+							return;							
+						case "Sat" :
+							datasets_dists[6] = element.temp_daily_avg
+							return;									
+					}
+				});
+				res.render("daily_temp", { user_first_name: req.session.user.first_name,curr_dog: req.params.dog_id, temp_daily: datasets_dists})
+			})
+	})
+
+
 	app.get("/hourly_pulse/:dog_id", authUser, (req, res) => {
 
 		var db = client.db("dogs")

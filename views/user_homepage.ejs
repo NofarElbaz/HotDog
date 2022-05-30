@@ -114,13 +114,28 @@
 			<div>
 				<button onclick="go_to_hourly_dist()"
 				><%= curr_dog.dog_name %>'s average hourly distance</button>
-				<button onclick="window.location='daily_distance.ejs'"><%= curr_dog.dog_name %>'s average daily distance</button>
+				<button onclick="go_to_daily_distance()"><%= curr_dog.dog_name %>'s average daily distance</button>
 				<button onclick="go_to_hourly_pulse()"><%= curr_dog.dog_name %>'s average hourly pulse</button>
-				<button onclick="window.location='daily_distance.ejs'"><%= curr_dog.dog_name %>'s average daily pulse</button>
+				<button onclick="go_to_daily_pulse()"><%= curr_dog.dog_name %>'s average daily pulse</button>
 				<button onclick="go_to_hourly_temp()"><%= curr_dog.dog_name %>'s average hourly temperature</button>
-				<button onclick="window.location='daily_distance.ejs'"><%= curr_dog.dog_name %>'s average daily temperature</button>
+				<button onclick="go_to_daily_tem()"><%= curr_dog.dog_name %>'s average daily temperature</button>
 			</div>
 			<script>
+                function go_to_daily_distance(){
+					var dog = document.getElementById("dog_id").innerHTML
+					console.log(dog)
+					window.location.href = 'daily_distance/'+ dog;
+				}
+                function go_to_daily_tem(){
+					var dog = document.getElementById("dog_id").innerHTML
+					console.log(dog)
+					window.location.href = 'daily_temp/'+ dog;
+				}
+                function go_to_daily_pulse(){
+					var dog = document.getElementById("dog_id").innerHTML
+					console.log(dog)
+					window.location.href = 'daily_pulse/'+ dog;
+				}
 				function go_to_hourly_dist(){
 					var dog = document.getElementById("dog_id").innerHTML
 					console.log(dog)
