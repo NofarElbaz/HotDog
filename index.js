@@ -146,16 +146,16 @@ MongoClient.connect("mongodb+srv://HotDog:HotDog@cluster0.9q7j7.mongodb.net/HotD
 					datasets_dists[hour] = element.temp_hourly_avg
 				});
 				console.log(req.params.dog_id)
-				res.render("hourly_temp", { user_first_name: req.session.user.first_name,curr_dog: req.params.dog_id, distance_hourly: datasets_dists})
+				res.render("hourly_temp", { user_first_name: req.session.user.first_name,curr_dog: req.params.dog_id, temp_hourly: datasets_dists})
 			})
 	})
 
 
 	app.get("/daily_distance/:dog_id", authUser, (req, res) => {
-
 		var db = client.db("dogs")
 		var db_collection_dist_hourly = db.collection("dog_AGG_avg_daily")
 		var ObjectId = require('mongodb').ObjectID;
+
 		db_collection_dist_hourly.find({ "dog_id": new ObjectId(req.params.dog_id), date_created: {
 			$gte: moment().day(-7).toDate(),
 			$lt: today.toDate()

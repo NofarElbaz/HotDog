@@ -72,11 +72,34 @@
                     <!-- /.col-lg-12 -->
                 </div>
                 <% if(curr_dog!=null) { %>
-                    <div id="distance_hourly_hid" style="visibility: hidden;"><%= distance_hourly %></div>	
+                    <div id="temp_hourly_hid" style="visibility: hidden;"><%= temp_hourly %></div>	
                     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
-                    <canvas id="lineChart"></canvas>
+                    <p id="dog_sick_msg"></p>
+					<canvas id="lineChart"></canvas>
                     <script>
+						var dog_data = (document.getElementById("temp_hourly_hid").innerHTML).split(',').map(Number)
+						var hours = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
+                                    "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
+						var is_sick_msg = null
+						for (let i = 0; i < dog_data.length; i++) {
+							if (dog_data[i] < 38 || dog_data[i] > 39){
+								if(is_sick_msg == null){
+									console.log('dsf')
+									is_sick_msg = "According to the dog's temperature data it seems that the dog needs to go see a veterinarian.<br>"
+									is_sick_msg += "A dog temperature shouldn't be above 39 or below 38.<br>"
+									is_sick_msg += "It seems that at " + hours[i] + ":00 the dog's temperature wasn't in the valid range.<br>"
+								}
+								else{
+									is_sick_msg += "It seems that at " + hours[i] + ":00 the dog's temperature wasn't in the valid range.<br>"
+								}
+								
+							} 
+						}
+						if(is_sick_msg == null){
+							is_sick_msg = "According to the dog's temperature data it seems that the dog is NOT sick"
+						}
+						document.getElementById('dog_sick_msg').innerHTML = is_sick_msg
                         //line
                         var ctxL = document.getElementById("lineChart").getContext('2d');
                         var myLineChart = new Chart(ctxL, {
@@ -85,8 +108,8 @@
                             labels: ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
                                     "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
                             datasets: [{
-                            label: "Distance (meter)",
-                            data: (document.getElementById("distance_hourly_hid").innerHTML).split(',').map(Number),
+                            label: "Temperature (℃)",
+                            data: (document.getElementById("temp_hourly_hid").innerHTML).split(',').map(Number),
                             backgroundColor: [
                                 'rgba(105, 0, 132, .2)',
                             ],
@@ -103,7 +126,7 @@
                         });
                         ctxL.height = 200;
                         ctxL.width = 200;
-                    </script> -->
+                    </script>
                 <% } %>
             </div>
             <!-- /.container-fluid -->

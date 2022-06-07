@@ -75,9 +75,27 @@
                     <div id="pulse_daily_hid" style="visibility: hidden;"><%= pulse_daily %></div>	
                     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
-                    <canvas id="barChart"></canvas>
+                    <ul>
+						<li id = 'Sun_sick'></li>
+						<li id = 'Mon_sick'></li>
+						<li id = 'Tue_sick'></li>
+						<li id = 'Wed_sick'></li>
+						<li id = 'Thu_sick'></li>
+						<li id = 'Fri_sick'></li>
+						<li id = 'Sat_sick'></li>
+					</ul>					  
+					<canvas id="barChart"></canvas>
                     <script>
-                        //bar
+                    //bar
+					var dog_data = (document.getElementById("pulse_daily_hid").innerHTML).split(',').map(Number)
+					var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri","Sat"]
+					for (let i = 0; i < dog_data.length; i++) {
+						var is_sick_msg = "According to the dog's pluse data it seems that the dog is NOT sick"
+						if (dog_data[i] < 60 || dog_data[i] > 120){
+							is_sick_msg = "According to the dog's pluse data it seems that the dog needs to go see a veterinarian"
+						} 
+						document.getElementById(days[i] + '_sick').innerHTML = days[i] + ': ' + is_sick_msg
+					}  
                     var ctxB = document.getElementById("barChart").getContext('2d');
                     var myBarChart = new Chart(ctxB, {
                     type: 'bar',
