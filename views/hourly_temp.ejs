@@ -84,14 +84,16 @@
 						var is_sick_msg = null
 						for (let i = 0; i < dog_data.length; i++) {
 							if (dog_data[i] < 38 || dog_data[i] > 39){
-								if(is_sick_msg == null){
-									console.log('dsf')
-									is_sick_msg = "According to the dog's temperature data it seems that the dog needs to go see a veterinarian.<br>"
-									is_sick_msg += "A dog temperature shouldn't be above 39 or below 38.<br>"
-									is_sick_msg += "It seems that at " + hours[i] + ":00 the dog's temperature wasn't in the valid range.<br>"
-								}
-								else{
-									is_sick_msg += "It seems that at " + hours[i] + ":00 the dog's temperature wasn't in the valid range.<br>"
+								if(dog_data[i] != 0){
+									if(is_sick_msg == null){
+										console.log('dsf')
+										is_sick_msg = "According to the dog's temperature data it seems that the dog needs to go see a veterinarian.<br>"
+										is_sick_msg += "A dog temperature shouldn't be above 39 or below 38.<br>"
+										is_sick_msg += "It seems that at " + hours[i] + ":00 the dog's temperature wasn't in the valid range.<br>"
+									}
+									else{
+										is_sick_msg += "It seems that at " + hours[i] + ":00 the dog's temperature wasn't in the valid range.<br>"
+									}
 								}
 								
 							} 

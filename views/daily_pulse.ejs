@@ -92,7 +92,9 @@
 					for (let i = 0; i < dog_data.length; i++) {
 						var is_sick_msg = "According to the dog's pluse data it seems that the dog is NOT sick"
 						if (dog_data[i] < 60 || dog_data[i] > 120){
-							is_sick_msg = "According to the dog's pluse data it seems that the dog needs to go see a veterinarian"
+							if(dog_data[i] != 0){
+								is_sick_msg = "According to the dog's pluse data it seems that the dog needs to go see a veterinarian"
+							}
 						} 
 						document.getElementById(days[i] + '_sick').innerHTML = days[i] + ': ' + is_sick_msg
 					}  
