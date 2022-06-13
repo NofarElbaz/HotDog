@@ -377,6 +377,7 @@ MongoClient.connect("mongodb+srv://HotDog:HotDog@cluster0.9q7j7.mongodb.net/HotD
 		// Connect to the collection
 		var db = client.db("dogs")
 		var db_collection = db.collection("dogs_info")
+		var ObjectId = require('mongodb').ObjectID;
 
 		if (db_collection) {
 			db_collection.find({ "dog_owner_id": req.session.user.id}).toArray(function (err, dogs) {
@@ -387,7 +388,49 @@ MongoClient.connect("mongodb+srv://HotDog:HotDog@cluster0.9q7j7.mongodb.net/HotD
 						choosen_dog = element
 					}
 				});
-				var db_collection_dist_hourly = db.collection("dog_AGG_avg_hourly")
+				var is_sick = false
+				var db_collection_dist_hourly = db.collection("dog_AGG_avg_daily")
+				db_collection_dist_hourly.find({ "dog_id": choosen_dog._id, date_created: {
+					$gte: moment().day(-1).toDate(),
+					$lt: today.toDate()
+					}}).toArray(function (err, dist_info) {
+						console.log(dist_info)
+						if(dist_info.length == 0){
+							is_sick = 'No data'
+							res.render("user_homepage", { user_first_name: req.session.user.first_name, dogs_info: dogs, curr_dog: choosen_dog, sick: is_sick})
+							return
+						}
+						if((dist_info[0].walking_hours < 1.0) || (dist_info[0].pulse_hourly_avg < 60) || (dist_info[0].pulse_hourly_avg > 120)){
+							is_sick = true
+						}
+						if(!is_sick){
+							var db_collection_dist_hourly = db.collection("dog_AGG_avg_hourly")
+							db_collection_dist_hourly.find({ "dog_id": choosen_dog._id}).limit(1).sort({$natural:-1}).toArray(function (err, hourly_info) {
+									if(hourly_info.length == 0){
+										is_sick = 'No data'
+										res.render("user_homepage", { user_first_name: req.session.user.first_name, dogs_info: dogs, curr_dog: choosen_dog, sick: is_sick})
+										return
+									}
+									if((hourly_info[0].temp_hourly_avg < 38.0) || (hourly_info[0].temp_hourly_avg > 39.0)){
+										is_sick = true
+									}
+									console.log(is_sick)
+									res.render("user_homepage", { user_first_name: req.session.user.first_name, dogs_info: dogs, curr_dog: choosen_dog, sick: is_sick})
+							})
+						}
+						else{
+							console.log(is_sick)
+							res.render("user_homepage", { user_first_name: req.session.user.first_name, dogs_info: dogs, curr_dog: choosen_dog, sick: is_sick})
+						}
+						
+						});
+						
+					})
+
+
+
+				// ---------------------------------------
+				/*
 				db_collection_dist_hourly.find({ "dog_id": choosen_dog._id, date_created: {
 					$gte: today.toDate(), 
 					$lt: moment(today).endOf('day').toDate()
@@ -405,7 +448,7 @@ MongoClient.connect("mongodb+srv://HotDog:HotDog@cluster0.9q7j7.mongodb.net/HotD
 
 				});
 				
-			})
+			})*/
 		}
 	})
 

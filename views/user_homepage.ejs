@@ -102,15 +102,21 @@
 					</section>					
 				</div>
 				<!-- row -->
-				<% if(curr_dog!=null) { %>
-					<div id="distance_hourly_hid" style="visibility: hidden;"><%= distance_hourly %></div>	
-				<% } %>
                 <!-- /.row -->
                 <!--row -->
     </div>
 	<div>
 		<% if(curr_dog!=null) { %>
 			<div id="dog_id" style="visibility: hidden;"><%= curr_dog._id %></div>	
+			<% if(sick==true) { %>
+				<p style="color:red">According to the dog's current data it seems that the dog needs to go see a veterinarian.</p>
+			<% } %>
+			<% if(sick=='No data') { %>
+				<p style="color:red">There are missing data that weren't entered lately, please check the dog's collar.</p>
+			<% } %>
+			<% if(sick==false) { %>
+				<p style="color:green">According to the dog's current data it seems that the dog is well.</p>
+			<% } %>
 			<div>
 				<button onclick="go_to_hourly_dist()"
 				><%= curr_dog.dog_name %>'s average hourly distance</button>
@@ -152,41 +158,6 @@
 					window.location.href = 'hourly_temp/'+ dog;
 				}
 			</script>
-			
-			<!-- <div>
-				<h1>Distance Hourly (meters)</h1>
-			</div>
-			<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
-			<canvas id="lineChart"></canvas>
-			<script>
-				//line
-				var ctxL = document.getElementById("lineChart").getContext('2d');
-				var myLineChart = new Chart(ctxL, {
-				  type: 'line',
-				  data: {
-					labels: ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
-							"13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
-					datasets: [{
-					  label: "Distance (meter)",
-					  data: (document.getElementById("distance_hourly_hid").innerHTML).split(',').map(Number),
-					  backgroundColor: [
-						'rgba(105, 0, 132, .2)',
-					  ],
-					  borderColor: [
-						'rgba(200, 99, 132, .7)',
-					  ],
-					  borderWidth: 2
-					}
-					]
-				  },
-				  options: {
-					responsive: true
-				  }
-				});
-				ctxL.height = 200;
-				ctxL.width = 200;
-			</script> -->
 		<% } %>
 	</div>
 	
